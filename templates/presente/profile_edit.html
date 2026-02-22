@@ -1,0 +1,57 @@
+{% extends "presente/private_base.html" %}
+{% load crispy_forms_tags static %}
+
+{% block crumb %}
+{{ block.super }}
+<li class="breadcrumb-item">
+  <a href="{% url 'users:user_profile' %}" class="text-decoration-none">{{ page_title }}</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Editar</li>
+{% endblock %}
+
+{% block app_content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-pencil-square"></i> Editar Perfil
+          </h5>
+        </div>
+        <form action="" method="post">
+          {% csrf_token %}
+          <div class="card-body">
+            <div class="text-center mb-4">
+              <img
+                {% if user.avatar_url %}
+                src="{{ user.avatar_url }}"
+                {% elif user.avatar %}
+                src="{{ user.avatar.url }}"
+                {% else %}
+                src="{% static 'img/placeholder/avatar.png' %}"
+                {% endif %}
+                class="rounded-circle shadow"
+                alt="Avatar do usuário"
+                style="width: 100px; height: 100px; object-fit: cover;"
+              />
+              <p class="text-muted small mt-2"><i class="bi bi-info-circle"></i> Avatar sincronizado do SUAP</p>
+            </div>
+            {{ form|crispy }}
+          </div>
+          <div class="card-footer bg-light">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+              <a href="{% url 'users:user_profile' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Salvar Alterações
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

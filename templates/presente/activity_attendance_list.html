@@ -1,0 +1,13 @@
+{% extends "core/list.html" %}
+{% block extra_actions %}
+<button
+  class="btn btn-success me-2"
+  hx-get="{% url 'presente:activity_attendance_export_config' activity.pk %}?{{ request.GET.urlencode }}"
+  hx-target="#modals-here .modal-content"
+  hx-trigger="click"
+  hx-include="#filter-form"
+  data-bs-toggle="modal"
+  data-bs-target="#modals-here">
+  <i class="bi bi-download"></i> Exportar Relatório
+</button>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% load i18n %}
+
+<div class="modal-header bg-primary text-white">
+  <h5 class="modal-title">
+    <i class="bi bi-download"></i> Exportar Relatório
+  </h5>
+  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+  <form id="exportConfigForm">
+
+    <!-- Preserve filter parameters -->
+    {% for key, value in filter_params.items %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+
+    <div class="mb-4">
+      <label class="form-label fw-bold">
+        <i class="bi bi-table"></i> Colunas a Exibir
+      </label>
+      <p class="text-muted small mb-3">Selecione as colunas que deseja incluir no relatório</p>
+
+      <div class="row">
+        {% for value, label in form.columns.field.choices %}
+        <div class="col-md-6 mb-2">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="columns"
+              value="{{ value }}"
+              id="modal_col_{{ value }}"
+              {% if value in form.fields.columns.initial %}checked{% endif %}
+            >
+            <label class="form-check-label" for="modal_col_{{ value }}">
+              {{ label }}
+            </label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="modal_sort_by" class="form-label fw-bold">
+        <i class="bi bi-sort-down"></i> Ordenar Por
+      </label>
+      <p class="text-muted small mb-2">Escolha como ordenar as presenças no relatório</p>
+      <select name="sort_by" id="modal_sort_by" class="form-select">
+        {% for value, label in form.sort_by.field.choices %}
+        <option value="{{ value }}" {% if value == current_sort %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="alert alert-info mb-0">
+      <i class="bi bi-info-circle"></i>
+      <strong>Opções de Exportação:</strong> Baixe o relatório em formato PDF ou CSV com as mesmas configurações.
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+    <i class="bi bi-x-circle"></i> Cancelar
+  </button>
+  <button type="button" class="btn btn-outline-success" onclick="downloadCSV({{ activity.pk }}, '{% url 'presente:activity_attendance_csv' activity.pk %}')">
+    <i class="bi bi-filetype-csv"></i> CSV
+  </button>
+  <button type="button" class="btn btn-primary" onclick="downloadPDF({{ activity.pk }}, '{% url 'presente:activity_attendance_pdf' activity.pk %}')">
+    <i class="bi bi-file-earmark-pdf"></i> PDF
+  </button>
+</div>
+
+<script>
+  // Load preferences when modal content is loaded via HTMX
+  loadExportPreferences();
+</script>

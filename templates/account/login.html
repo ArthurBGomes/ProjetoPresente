@@ -1,0 +1,71 @@
+{% extends "account/base_entrance.html" %}
+
+{% load i18n %}
+{% load allauth account socialaccount %}
+{% load static %}
+
+{% block title %} {% trans "Sign In" %} {% endblock %}
+
+{% block content %}
+  {% if SOCIALACCOUNT_ENABLED %}
+  <div class="social-auth-links text-center mb-3 d-grid gap-2">
+    {% get_providers as socialaccount_providers %}
+      {% for provider in socialaccount_providers %}
+        {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+        <a href="{{ href }}" class="btn btn-success text-white p-3 fw-semibold">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Acessar com o {{ provider.name }}
+        </a>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a class="text-decoration-none small text-muted" data-bs-toggle="collapse" href="#emailLoginCollapse" role="button" aria-expanded="false" aria-controls="emailLoginCollapse">
+      <i class="bi bi-chevron-down me-1"></i>Outras opções de acesso
+    </a>
+  </div>
+
+  <div class="collapse mt-3" id="emailLoginCollapse">
+    <div class="p-divider mb-3">
+      <span class="middle-border-bottom small text-muted">
+        Email e senha
+      </span>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors  %}
+          <small class="text-danger mb-3 d-block">{{ error }}</small>
+        {% endfor %}
+      {% endif %}
+
+      {% for field in form %}
+        <div class="input-group mb-3">
+          {{field}}
+          <div class="input-group-text">
+            <span class="bi {% if field.name == 'login' %} bi-at {% else %}  bi-lock {% endif %}"></span>
+          </div>
+        </div>
+        <small class="text-danger">{{ field.errors }}</small>
+      {% endfor %}
+        <div class="row">
+          <div class="col-12">
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-secondary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>{% trans "Sign In" %}
+              </button>
+            </div>
+          </div>
+        </div>
+    </form>
+    {% comment %}
+    <p class="my-3 text-center">
+      <a href="{% url 'account_reset_password' %}" class="link-primary text-decoration-none small">
+        <i class="bi bi-key me-1"></i>{% trans "Password Reset" %}
+      </a>
+    </p>
+    {% endcomment %}
+  </div>
+{% endblock content %}

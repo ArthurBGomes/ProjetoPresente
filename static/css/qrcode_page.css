@@ -1,0 +1,33 @@
+/* Gradient backgrounds */
+.qr-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.qr-header-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* QR Code styling */
+.qr-code-link {
+  transition: opacity 3s ease-in-out;
+  text-decoration: none;
+  cursor: pointer;
+  max-width: 400px;
+}
+
+.qr-code-link.qr-fade-out {
+  opacity: 0.3;
+}
+
+/* Responsive QR size based on viewport height */
+@media (min-height: 900px) {
+  .qr-code-link {
+    max-width: 600px !important;
+  }
+}
+
+@media (min-height: 1080px) {
+  .qr-code-link {
+    max-width: 700px !important;
+  }
+}

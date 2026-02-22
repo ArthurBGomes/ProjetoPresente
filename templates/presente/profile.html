@@ -1,0 +1,143 @@
+{% extends "presente/private_base.html" %}
+{% load static %}
+
+{% block crumb %}
+{{ block.super }}
+<li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+{% endblock %}
+
+{% block app_content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-person-circle"></i> Perfil do Usuário
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12 text-center mb-3">
+              <img
+                {% if user.avatar_url %}
+                src="{{ user.avatar_url }}"
+                {% elif user.avatar %}
+                src="{{ user.avatar.url }}"
+                {% else %}
+                src="{% static 'img/placeholder/avatar.png' %}"
+                {% endif %}
+                class="rounded-circle shadow"
+                alt="Avatar do usuário"
+                style="width: 150px; height: 150px; object-fit: cover;"
+              />
+            </div>
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Nome Completo</label>
+                <div class="detail-value">{{ user.get_full_name }}</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Email</label>
+                <div class="detail-value">{{ user.email }}</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Usuário</label>
+                <div class="detail-value">{{ user.username }}</div>
+              </div>
+            </div>
+            {% if user.is_suap_user %}
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Matrícula</label>
+                <div class="detail-value">
+                  {% if user.matricula %}
+                    {{ user.matricula }}
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Campus</label>
+                <div class="detail-value">
+                  {% if user.campus %}
+                    {{ user.campus }}
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% if user.type == "ALUNO" %}
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Curso</label>
+                <div class="detail-value">
+                  {% if user.curso %}
+                    {{ user.curso }}
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Período de Referência</label>
+                <div class="detail-value">
+                  {% if user.periodo_referencia %}
+                    {{ user.periodo_referencia }}
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="col-12">
+              <div class="detail-field">
+                <label class="text-muted small text-uppercase mb-1">Tipo</label>
+                <div class="detail-value">
+                  {% if user.type %}
+                    <span class="badge {% if user.type == 'SERVIDOR' %}bg-success{% else %}bg-info{% endif %}">
+                      {{ user.get_type_display }}
+                    </span>
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-light">
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <a href="{% url 'presente:index' %}" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            {% if not user.is_suap_user %}
+            <div class="d-flex gap-2">
+              <a href="{% url 'users:user_profile_change' %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Editar Perfil
+              </a>
+            </div>
+            {% else %}
+            <div class="text-muted small">
+              <i class="bi bi-info-circle"></i> Perfil gerenciado pelo SUAP
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+/* Breadcrumb improvements */
+.breadcrumb {
+  font-size: 0.875rem;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+  color: #6c757d;
+  opacity: 0.5;
+}
+.breadcrumb-item a {
+  color: #495057;
+  transition: color 0.15s ease-in-out;
+}
+.breadcrumb-item a:hover {
+  color: #0d6efd;
+}
+.breadcrumb-item.active {
+  color: #6c757d;
+  font-weight: 500;
+}

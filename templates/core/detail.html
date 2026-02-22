@@ -1,0 +1,74 @@
+{% extends "core/list.html" %}
+
+{% block crumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'presente:index' %}" class="text-decoration-none">
+    <i class="bi bi-house-door"></i> Início
+  </a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url allowed_actions.list %}" class="text-decoration-none">{{ page_title }}</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">{{ object }}</li>
+{% endblock %}
+
+{% block app_content %}
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card card-primary card-outline mb-4">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="bi bi-info-circle"></i> {{ object|capfirst }}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for field in fields %}
+            <div class="col-md-6 mb-3">
+              <label class="text-muted small text-uppercase mb-1">{{ field.label|capfirst }}</label>
+              <div>
+                {% if field.safe %}
+                  {{ field.value|safe }}
+                {% else %}
+                  {% if field.value %}
+                    {{ field.value }}
+                  {% else %}
+                    <span class="text-muted">-</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="card-footer bg-light">
+          <a href="{% url allowed_actions.list %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+          <div class="float-end">
+            {% block card_footer_actions %}
+            {% if "change" in allowed_actions %}
+            <a href="{% url allowed_actions.change object.id %}" class="btn btn-primary me-2">
+              <i class="bi bi-pencil"></i> Editar
+            </a>
+            {% endif %}
+            {% if "delete" in allowed_actions %}
+            <button
+              hx-get="{% url allowed_actions.delete object.id %}"
+              hx-target=".modal-content"
+              hx-trigger="click"
+              data-bs-toggle="modal"
+              data-bs-target="#modals-here"
+              class="btn btn-danger">
+              <i class="bi bi-trash"></i> Remover
+            </button>
+            {% endif %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
