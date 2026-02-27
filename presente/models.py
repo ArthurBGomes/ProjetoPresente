@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from taggit.managers import TaggableManager
@@ -62,6 +63,7 @@ class ActivityManager(models.Manager):
 
 
 class Activity(models.Model):
+    
     owners = models.ManyToManyField(
         User,
         related_name="owned_activities",
@@ -100,13 +102,39 @@ class Activity(models.Model):
         blank=True,
         help_text=_("Selecione as redes que podem acessar esta atividade"),
     )
+    trilha = models.ForeignKey(
+    "TrilhaGamificacao",
+    on_delete=models.CASCADE,
+    related_name="activities",
+    verbose_name=_("Trilha"),
+)
+    gamificacao = models.ForeignKey(
+        "Gamificacao",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="activities",
+        verbose_name=_("Gamificação associada"),
+        help_text=_("Gamificação concedida ao registrar presença nesta atividade."),
+    )
+    def clean(self):
+        if self.gamificacao and self.trilha:
+            if self.gamificacao.trilha != self.trilha:
+                raise ValidationError(
+                    _("A gamificação deve pertencer à mesma trilha da atividade.")
+                )
+        
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     created_at = models.DateTimeField(
         _("Criação"), auto_now_add=True, null=True, blank=True
     )
     modified_at = models.DateTimeField(
         _("Modificação"), auto_now=True, null=True, blank=True
     )
-
+   
     objects = ActivityManager()
 
     def __str__(self):
@@ -164,6 +192,7 @@ class Activity(models.Model):
     class Meta:
         verbose_name = _("Atividade")
         verbose_name_plural = _("Atividades")
+
 
 
 class Attendance(models.Model):
@@ -228,6 +257,15 @@ class Attendance(models.Model):
         except ValueError:
             # Invalid IP address
             return self.ip_address
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new and self.activity.gamificacao:
+                UsuarioGamificacao.objects.get_or_create(
+                user=self.user,
+                gamificacao=self.activity.gamificacao
+            )
 
     class Meta:
         verbose_name = _("Presença")
@@ -323,6 +361,15 @@ class Gamificacao(models.Model):
         default=0,
         help_text=_("Quantidade de pontos concedidos"),
     )
+    def clean(self):
+        if self.tipo.trilha != self.trilha:
+           raise ValidationError(
+             _("O tipo de gamificação deve pertencer à mesma trilha.")
+        )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = _("Gamificação")
