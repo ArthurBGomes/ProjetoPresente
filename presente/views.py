@@ -1,5 +1,8 @@
+from multiprocessing import context
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.views.generic.base import TemplateView
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404,render
@@ -47,7 +50,8 @@ from .utils import (
 User = get_user_model()
 
 
-class IndexView(LoginRequiredMixin, PageTitleMixin, TemplateView):
+class IndexView(LoginRequiredMixin, PageTitleMixin, TemplateView): # view da página inicial
+    from .models import UsuarioGamificacao
     template_name = "presente/index.html"
     page_title = _("Dashboard")
 
@@ -67,6 +71,15 @@ class IndexView(LoginRequiredMixin, PageTitleMixin, TemplateView):
             .select_related("activity")
             .order_by("-checked_in_at")[:5]
         )
+        total_points = (
+            UsuarioGamificacao.objects
+            .filter(user=self.request.user)
+            .select_related("gamificacao")
+             .aggregate(total=Sum("gamificacao__pontos"))
+        )["total"] or 0
+
+        context["my_points"] = total_points
+
         return context
 
 
